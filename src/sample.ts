@@ -10,6 +10,7 @@ function getUser(id: number): User {
     email: "juan@example.com",
     role: "student",
     isActive: true,
+    score: 95.5,
   };
 }
 
@@ -17,10 +18,10 @@ function getUser(id: number): User {
 function calculateGrade(score: number, maxScore: number): string {
   const percentage: number = (score / maxScore) * 100;
 
-  if (percentage >= 90) return "A";
-  if (percentage >= 80) return "B";
-  if (percentage >= 70) return "C";
-  return "F";
+  if (percentage >= 90) return "The grade is A";
+  if (percentage >= 80) return "The grade is B";
+  if (percentage >= 70) return "The grade is C";
+  return "The grade is F";
 }
 
 // Format course

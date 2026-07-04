@@ -4,6 +4,7 @@ export interface User {
   email: string;
   role: "student" | "admin" | "instructor";
   isActive: boolean;
+  score: number;
 }
 
 export interface Course {
