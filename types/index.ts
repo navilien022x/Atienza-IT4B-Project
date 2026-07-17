@@ -1,48 +1,188 @@
+// =====================================
+// CAMPUS FOOD PRE-ORDER SYSTEM
+// =====================================
+
+
+// ================================
+// CORE ENTITIES
+// ================================
+
+
 export interface User {
+
   id: number;
+
   name: string;
+
   email: string;
-  role: "student" | "admin" | "instructor";
+
+  role: "student" | "vendor_admin";
+
   isActive: boolean;
-  score: number;
+
 }
 
-export interface Course {
-  code: string;
-  title: string;
-  units: number;
-  semester: string;
-}
 
-export interface Submission {
+
+export interface FoodItem {
+
   id: number;
-  studentId: number;
-  courseCode: string;
-  repoUrl: string;
-  submittedAt: Date;
-  score?: number;
+
+  name: string;
+
+  description: string;
+
+  price: number;
+
+  category: string;
+
+  available: boolean;
+
 }
 
-// ONLY TYPES BELOW THIS LINE
 
-export type ID = number | string;
 
-export type Coordinate = {
-  x: number;
-  y: number;
-};
+export interface Order {
 
-export type Formatter = (value: number) => string;
+  id: number;
 
-export type StringOrNumber = string | number;
+  userId: number;
 
-export type Status = "pending" | "active" | "inactive";
+  foodItemIds: number[];
 
-export function printId(id: StringOrNumber): void {
-  console.log(`ID: ${id}`);
+  totalAmount: number;
+
+  status: OrderStatus;
+
+  createdAt: Date;
+
 }
 
-export type StudentWithCourse = User & {
-  enrolledCourse: Course;
-  gpa: number;
-};
+
+
+// ================================
+// ENUM
+// ================================
+
+
+export enum OrderStatus {
+
+  Placed,
+
+  Preparing,
+
+  ReadyForPickup
+
+}
+
+
+
+// ================================
+// GENERIC INTERFACE
+// ================================
+
+
+export interface ApiResponse<T> {
+
+  success: boolean;
+
+  data: T;
+
+  message?: string;
+
+}
+
+
+
+// ================================
+// UTILITY TYPES
+// ================================
+
+
+// Partial
+
+export type FoodItemUpdate =
+Partial<FoodItem>;
+
+
+// Pick
+
+export type FoodPreview =
+Pick<
+  FoodItem,
+  "id" | "name" | "price"
+>;
+
+
+// Omit
+
+export type PublicUser =
+Omit<
+  User,
+  "email"
+>;
+
+
+// Record
+
+export type OrderStatusCount =
+Record<
+  "placed" | "preparing" | "ready",
+  number
+>;
+
+
+// ReturnType
+
+export function createOrder(
+  userId: number,
+  foodItemIds: number[]
+) {
+
+  return {
+
+    id: Date.now(),
+
+    userId,
+
+    foodItemIds,
+
+    status: OrderStatus.Placed,
+
+    createdAt: new Date()
+
+  };
+
+}
+
+
+export type NewOrder =
+ReturnType<typeof createOrder>;
+
+
+
+// ================================
+// GENERIC FUNCTIONS
+// ================================
+
+
+export function getFirst<T>(
+  items: T[]
+): T | undefined {
+
+  return items[0];
+
+}
+
+
+
+export function getById<T extends { id: number }>(
+  items: T[],
+  id: number
+): T | undefined {
+
+  return items.find(
+    item => item.id === id
+  );
+
+}
