@@ -4,7 +4,7 @@
 
 The Campus Food Pre-Order System is a TypeScript-based application designed to improve the food ordering experience within a campus environment.
 
-The system allows students to browse available food items, place advance orders, and track their order status. Vendor administrators can manage campus food offerings and monitor customer orders.
+The system allows students to browse available food items, place advance orders, and track their order status. Vendor administrators will be able to manage campus food offerings and monitor customer orders in the future.
 
 This project serves as the foundation for future development using React and TypeScript.
 

@@ -322,7 +322,7 @@ const response: ApiResponse<Order> = {
 
 
 console.log(
-  "\n=== Activity Requirements ==="
+  "\n=== Activity Requirements - GT1 Part 2 ==="
 );
 
 console.log(
