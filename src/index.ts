@@ -319,3 +319,28 @@ const response: ApiResponse<Order> = {
   message: "Order processed successfully"
 
 };
+
+
+console.log(
+  "\n=== Activity Requirements ==="
+);
+
+console.log(
+  "\n=== Partial ==="
+);
+console.log(updateFood);
+
+console.log(
+  "\n=== Pick ==="
+);
+console.log(foodPreview);
+
+console.log(
+  "\n=== Omit==="
+);
+console.log(publicUser);
+
+console.log(
+  "\n=== Record ==="
+);
+console.log(orderCount);
