@@ -229,7 +229,6 @@ Status: ${OrderStatus[order.status]}`
 );
 
 
-
 // ================================
 // GT1 REQUIREMENTS
 // ================================
@@ -267,7 +266,6 @@ const foodPreview: FoodPreview = {
   price: 85
 
 };
-
 
 
 // Omit
@@ -321,22 +319,3 @@ const response: ApiResponse<Order> = {
   message: "Order processed successfully"
 
 };
-
-
-// Prevent unused variable warnings
-
-void firstFood;
-
-void selectedFood;
-
-void updateFood;
-
-void foodPreview;
-
-void publicUser;
-
-void orderCount;
-
-void newOrder;
-
-void response;
