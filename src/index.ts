@@ -16,7 +16,7 @@ import type {
 
   OrderStatusCount
 
-} from "../types";
+} from "./types";
 
 
 import {
@@ -29,7 +29,7 @@ import {
 
   createOrder
 
-} from "../types";
+} from "./types";
 
 
 
@@ -324,6 +324,8 @@ const response: ApiResponse<Order> = {
 console.log(
   "\n=== Activity Requirements - GT1 Part 2 ==="
 );
+
+console.log({ firstFood, selectedFood, newOrder, response });
 
 console.log(
   "\n=== Partial ==="
