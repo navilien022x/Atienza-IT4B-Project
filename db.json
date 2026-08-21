@@ -1,0 +1,18 @@
+{
+  "users": [
+    { "id": 1, "name": "Neil Atienza", "email": "neil@gmail.com", "role": "student", "isActive": true },
+    { "id": 2, "name": "Campus Food Admin", "email": "admin@campusfood.com", "role": "vendor_admin", "isActive": true }
+  ],
+  "foodItems": [
+    { "id": 1, "name": "Chicken Rice Meal", "description": "Grilled chicken with rice and vegetables", "price": 85, "category": "Meals", "available": true },
+    { "id": 2, "name": "Milk Tea", "description": "Classic milk tea with pearls", "price": 75, "category": "Drinks", "available": true },
+    { "id": 3, "name": "Beef Tapa", "description": "Cured beef served with garlic rice", "price": 120, "category": "Meals", "available": true },
+    { "id": 4, "name": "Iced Coffee", "description": "Cold brewed coffee with ice", "price": 60, "category": "Drinks", "available": true },
+    { "id": 5, "name": "Adobo Bowl", "description": "Traditional Filipino chicken adobo", "price": 95, "category": "Meals", "available": true }
+  ],
+  "orders": [
+    { "id": 101, "userId": 1, "foodItemIds": [1, 2], "totalAmount": 160, "status": 0, "createdAt": "2024-01-15T09:00:00.000Z" },
+    { "id": 102, "userId": 2, "foodItemIds": [3, 4], "totalAmount": 180, "status": 1, "createdAt": "2024-01-16T10:30:00.000Z" },
+    { "id": 103, "userId": 1, "foodItemIds": [5], "totalAmount": 95, "status": 2, "createdAt": "2024-01-17T12:00:00.000Z" }
+  ]
+}
