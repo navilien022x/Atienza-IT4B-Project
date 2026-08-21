@@ -1,36 +1,14 @@
 import { useNavigate } from 'react-router'
-import type { Order } from '../types/index'
+import { useQuery } from '@tanstack/react-query'
+import { getOrders } from '../api/client'
 import { OrderStatus } from '../types/index'
-
-const allOrders: Order[] = [
-  {
-    id: 101,
-    userId: 1,
-    foodItemIds: [1, 2],
-    totalAmount: 160,
-    status: OrderStatus.Placed,
-    createdAt: new Date('2024-01-15'),
-  },
-  {
-    id: 102,
-    userId: 2,
-    foodItemIds: [3, 4],
-    totalAmount: 180,
-    status: OrderStatus.Preparing,
-    createdAt: new Date('2024-01-16'),
-  },
-  {
-    id: 103,
-    userId: 1,
-    foodItemIds: [5],
-    totalAmount: 95,
-    status: OrderStatus.ReadyForPickup,
-    createdAt: new Date('2024-01-17'),
-  },
-]
 
 export function OrdersPage() {
   const navigate = useNavigate()
+  const { data: allOrders = [], isLoading, isError } = useQuery({
+    queryKey: ['orders'],
+    queryFn: getOrders,
+  })
 
   const handleOrderClick = (orderId: number) => {
     navigate(`/orders/${orderId}`)
@@ -44,7 +22,11 @@ export function OrdersPage() {
           <p className="mt-2 text-slate-600 dark:text-slate-300">View and manage all your food orders</p>
         </header>
 
-        {allOrders.length === 0 ? (
+        {isLoading ? (
+          <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center dark:border-slate-700 dark:bg-slate-900">Loading orders...</div>
+        ) : isError ? (
+          <div className="rounded-2xl border border-red-200 bg-red-50 p-8 text-center text-red-700">Unable to load orders.</div>
+        ) : allOrders.length === 0 ? (
           <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center dark:border-slate-700 dark:bg-slate-900">
             <p className="text-slate-600 dark:text-slate-300">No orders found</p>
           </div>
@@ -60,7 +42,7 @@ export function OrdersPage() {
                   <div className="flex-1">
                     <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">Order #{order.id}</h3>
                     <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
-                      {order.createdAt.toLocaleDateString()} at {order.createdAt.toLocaleTimeString()}
+                      {new Date(order.createdAt).toLocaleDateString()} at {new Date(order.createdAt).toLocaleTimeString()}
                     </p>
                     <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
                       {order.foodItemIds.length} item{order.foodItemIds.length !== 1 ? 's' : ''}

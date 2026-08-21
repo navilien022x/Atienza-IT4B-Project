@@ -1,43 +1,22 @@
 import { useParams, useNavigate } from 'react-router'
-import type { Order } from '../types/index'
+import { useQuery } from '@tanstack/react-query'
+import { getOrder } from '../api/client'
 import { OrderStatus } from '../types/index'
 
 interface OrderParams extends Record<string, string | undefined> {
   id?: string
 }
 
-const sampleOrders: Record<string, Order> = {
-  '101': {
-    id: 101,
-    userId: 1,
-    foodItemIds: [1, 2],
-    totalAmount: 160,
-    status: OrderStatus.Placed,
-    createdAt: new Date('2024-01-15'),
-  },
-  '102': {
-    id: 102,
-    userId: 2,
-    foodItemIds: [3, 4],
-    totalAmount: 180,
-    status: OrderStatus.Preparing,
-    createdAt: new Date('2024-01-16'),
-  },
-  '103': {
-    id: 103,
-    userId: 1,
-    foodItemIds: [5],
-    totalAmount: 95,
-    status: OrderStatus.ReadyForPickup,
-    createdAt: new Date('2024-01-17'),
-  },
-}
-
 export function OrderPage() {
   const { id } = useParams<OrderParams>()
   const navigate = useNavigate()
+  const { data: order, isLoading } = useQuery({
+    queryKey: ['order', id],
+    queryFn: () => getOrder(id!),
+    enabled: Boolean(id),
+  })
 
-  const order = id ? sampleOrders[id] : null
+  if (isLoading) return <div className="p-8 text-center">Loading order...</div>
 
   if (!order) {
     return (
@@ -74,7 +53,7 @@ export function OrderPage() {
             <div>
               <h1 className="text-4xl font-black text-slate-800 dark:text-slate-100">Order #{order.id}</h1>
               <p className="mt-2 text-slate-600 dark:text-slate-300">
-                Placed on {order.createdAt.toLocaleDateString()}
+                Placed on {new Date(order.createdAt).toLocaleDateString()}
               </p>
             </div>
           </div>
@@ -118,7 +97,7 @@ export function OrderPage() {
             <div className="flex justify-between border-t border-slate-200 pt-4 dark:border-slate-700">
               <dt className="text-sm font-medium text-slate-600 dark:text-slate-400">Created</dt>
               <dd className="text-sm font-semibold text-slate-800 dark:text-slate-200">
-                {order.createdAt.toLocaleString()}
+                {new Date(order.createdAt).toLocaleString()}
               </dd>
             </div>
           </dl>

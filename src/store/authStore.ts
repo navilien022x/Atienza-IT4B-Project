@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 
 export type UserRole = 'student' | 'vendor'
 
@@ -9,17 +10,16 @@ export interface AuthState {
   logout: () => void
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
-  token: localStorage.getItem('authToken'),
-  role: (localStorage.getItem('userRole') as UserRole) || null,
+export const useAuthStore = create<AuthState>()(persist((set) => ({
+  token: null,
+  role: null,
   login: (token: string, role: UserRole) => {
-    localStorage.setItem('authToken', token)
-    localStorage.setItem('userRole', role)
     set({ token, role })
   },
   logout: () => {
-    localStorage.removeItem('authToken')
-    localStorage.removeItem('userRole')
     set({ token: null, role: null })
   },
+}), {
+  name: 'campus-food-auth',
+  partialize: (state) => ({ token: state.token, role: state.role }),
 }))

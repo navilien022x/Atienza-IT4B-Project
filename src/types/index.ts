@@ -55,6 +55,7 @@ export interface Order {
   status: OrderStatus;
 
   createdAt: Date;
+  notes?: string;
 
 }
 
@@ -187,3 +188,8 @@ export function getById<T extends { id: number }>(
   );
 
 }
+
+export type ApiFoodItem = Omit<FoodItem, 'id'> & { id: number }
+export type ApiUser = Omit<User, 'id'> & { id: number }
+export type ApiOrder = Omit<Order, 'createdAt'> & { id: number; createdAt: string }
+export type CreateOrderInput = Omit<ApiOrder, 'id'>

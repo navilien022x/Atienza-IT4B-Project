@@ -1,52 +1,11 @@
 import { useState, type ChangeEvent } from 'react'
 import { useNavigate } from 'react-router'
+import { useQuery } from '@tanstack/react-query'
 import CourseCard from '../components/CourseCard'
 import { useCartStore } from '../store/cartStore'
 import { useAuthStore } from '../store/authStore'
+import { getFoodItems } from '../api/client'
 import type { FoodItem } from '../types/index'
-
-const menuItems: FoodItem[] = [
-  {
-    id: 1,
-    name: 'Chicken Rice Meal',
-    description: 'Grilled chicken with rice and vegetables',
-    price: 85,
-    category: 'Meals',
-    available: true,
-  },
-  {
-    id: 2,
-    name: 'Milk Tea',
-    description: 'Classic milk tea with pearls',
-    price: 75,
-    category: 'Drinks',
-    available: true,
-  },
-  {
-    id: 3,
-    name: 'Beef Tapa',
-    description: 'Cured beef served with garlic rice',
-    price: 120,
-    category: 'Meals',
-    available: true,
-  },
-  {
-    id: 4,
-    name: 'Iced Coffee',
-    description: 'Cold brewed coffee with ice',
-    price: 60,
-    category: 'Drinks',
-    available: true,
-  },
-  {
-    id: 5,
-    name: 'Adobo Bowl',
-    description: 'Traditional Filipino chicken adobo',
-    price: 95,
-    category: 'Meals',
-    available: true,
-  },
-]
 
 export function MenuPage() {
   const [searchTerm, setSearchTerm] = useState('')
@@ -55,6 +14,10 @@ export function MenuPage() {
   const navigate = useNavigate()
   const { addToCart, getTotalItems } = useCartStore()
   const { role } = useAuthStore()
+  const { data: menuItems = [], isLoading, isError } = useQuery({
+    queryKey: ['foodItems'],
+    queryFn: getFoodItems,
+  })
 
   const handleAddToCart = (item: FoodItem) => {
     if (role !== 'student') {
@@ -154,7 +117,7 @@ export function MenuPage() {
 
         <section className="space-y-4">
           <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100">
-            {filteredItems.length} items available
+            {isLoading ? 'Loading menu...' : isError ? 'Menu unavailable' : `${filteredItems.length} items available`}
           </h2>
           {filteredItems.length === 0 && (
             <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center dark:border-slate-700 dark:bg-slate-900">

@@ -1,86 +1,33 @@
 import { useEffect, useRef, useState, type ChangeEvent } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import heroImg from '../assets/hero.png'
 import UserCard from '../components/UserCard'
 import CourseCard from '../components/CourseCard'
 import { useToggle } from '../hooks/useToggle'
-import type { User, FoodItem, Order } from '../types/index'
-import { OrderStatus } from '../types/index'
-
-const initialUsers: User[] = [
-  {
-    id: 1,
-    name: 'Neil Atienza',
-    email: 'neil@gmail.com',
-    role: 'student',
-    isActive: true,
-  },
-  {
-    id: 2,
-    name: 'Campus Food Admin',
-    email: 'admin@campusfood.com',
-    role: 'vendor_admin',
-    isActive: true,
-  },
-]
-
-const initialFoodItems: FoodItem[] = [
-  {
-    id: 1,
-    name: 'Chicken Rice Meal',
-    description: 'Grilled chicken with rice and vegetables',
-    price: 85,
-    category: 'Meals',
-    available: true,
-  },
-  {
-    id: 2,
-    name: 'Milk Tea',
-    description: 'Classic milk tea with pearls',
-    price: 75,
-    category: 'Drinks',
-    available: true,
-  },
-]
-
-const initialOrder: Order = {
-  id: 101,
-  userId: 1,
-  foodItemIds: [1, 2],
-  totalAmount: 160,
-  status: OrderStatus.Placed,
-  createdAt: new Date(),
-}
+import type { User, FoodItem } from '../types/index'
+import { getFoodItems, getOrders, getUsers } from '../api/client'
+import { useUiStore } from '../store/uiStore'
 
 export function HomePage() {
-  const [users, setUsers] = useState<User[]>([])
-  const [foodItems, setFoodItems] = useState<FoodItem[]>([])
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [selectedFood, setSelectedFood] = useState<FoodItem | null>(null)
   const [selectionMessage, setSelectionMessage] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
   const [previousSearchTerm, setPreviousSearchTerm] = useState<string | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [isDark, setIsDark] = useState(false)
+  const { isDark, toggleDark } = useUiStore()
   const { isEnabled: isExpanded, toggle: toggleExpanded } = useToggle(false)
   const searchInputRef = useRef<HTMLInputElement | null>(null)
+  const usersQuery = useQuery({ queryKey: ['users'], queryFn: getUsers })
+  const foodQuery = useQuery({ queryKey: ['foodItems'], queryFn: getFoodItems })
+  const ordersQuery = useQuery({ queryKey: ['orders'], queryFn: getOrders })
+  const isLoading = usersQuery.isLoading || foodQuery.isLoading || ordersQuery.isLoading
+  const hasError = usersQuery.isError || foodQuery.isError || ordersQuery.isError
+  const users: User[] = usersQuery.data ?? []
+  const foodItems: FoodItem[] = foodQuery.data ?? []
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', isDark)
   }, [isDark])
-
-  useEffect(() => {
-    const timer = window.setTimeout(() => {
-      setUsers(initialUsers)
-      setFoodItems(initialFoodItems)
-      setSelectedOrder(initialOrder)
-      setSelectedFood(initialFoodItems[0])
-      setSelectedUser(initialUsers[0])
-      setIsLoading(false)
-    }, 350)
-
-    return () => window.clearTimeout(timer)
-  }, [])
 
   useEffect(() => {
     if (searchInputRef.current) {
@@ -111,10 +58,22 @@ export function HomePage() {
 
   const fallbackUser = selectedUser ?? users[0]
   const fallbackFood = selectedFood ?? foodItems[0]
-  const fallbackOrder = selectedOrder ?? initialOrder
+  const firstApiOrder = ordersQuery.data?.[0]
+  const fallbackOrder = firstApiOrder ? { ...firstApiOrder, createdAt: new Date(firstApiOrder.createdAt) } : null
 
   const showSummary = fallbackUser?.role === 'vendor_admin'
-  const isReady = !isLoading && Boolean(fallbackUser) && Boolean(fallbackFood) && Boolean(selectedOrder)
+  const isReady = !isLoading && Boolean(fallbackUser) && Boolean(fallbackFood) && Boolean(fallbackOrder)
+
+  if (!isLoading && hasError) {
+    return (
+      <div className="min-h-screen bg-slate-100 px-4 py-8 text-slate-800 dark:bg-slate-950 dark:text-slate-100 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-5xl rounded-[28px] border border-red-200 bg-red-50 p-8 text-center dark:border-red-500/20 dark:bg-red-500/10">
+          <h1 className="text-3xl font-black text-red-700 dark:text-red-300">Dashboard unavailable</h1>
+          <p className="mt-3 text-sm text-red-700 dark:text-red-200">Start the API with <code>npm run api</code>, then reload this page.</p>
+        </div>
+      </div>
+    )
+  }
 
   if (!isReady) {
     return (
@@ -126,12 +85,12 @@ export function HomePage() {
               <div className="space-y-3">
                 <p className="text-xs font-bold uppercase tracking-[0.28em] text-orange-600 dark:text-orange-300">Campus Food Pre-Order</p>
                 <h1 className="text-3xl font-black tracking-tight text-orange-700 dark:text-orange-200 sm:text-4xl">Loading your dashboard…</h1>
-                <p className="text-sm text-slate-600 dark:text-slate-300">Preparing the mock data and cards for your campus order overview.</p>
+                <p className="text-sm text-slate-600 dark:text-slate-300">Preparing your campus order overview.</p>
               </div>
             </div>
             <div className="mt-6 flex items-center gap-3 rounded-2xl border border-orange-200 bg-white/70 p-4 text-sm text-slate-700 shadow-sm dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-200">
               <span className="h-3 w-3 animate-pulse rounded-full bg-orange-500" aria-hidden="true" />
-              <span>Loading mock data from state...</span>
+              <span>Loading campus data from the API...</span>
             </div>
           </header>
         </div>
@@ -153,7 +112,7 @@ export function HomePage() {
             </div>
             <button
               type="button"
-              onClick={() => setIsDark((value) => !value)}
+              onClick={toggleDark}
               className="inline-flex items-center justify-center rounded-full border border-orange-300 bg-white/80 px-4 py-2 text-sm font-semibold text-orange-700 shadow-sm transition hover:border-orange-400 hover:bg-orange-50 dark:border-slate-600 dark:bg-slate-800 dark:text-orange-200 dark:hover:bg-slate-700"
             >
               {isDark ? 'Light mode' : 'Dark mode'}
@@ -167,9 +126,9 @@ export function HomePage() {
         <section className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
-              <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100">Mock data status</h2>
+                <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100">Live data status</h2>
               <div className="mt-3 inline-flex items-center rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300">
-                {isLoading ? 'Loading state' : 'Loaded from state'}
+                {isLoading ? 'Loading data' : 'Loaded from API'}
               </div>
               <p className="mt-3 text-sm text-slate-600 dark:text-slate-300">Previous search: {previousSearchTerm ?? 'none'}</p>
               <button
@@ -181,7 +140,7 @@ export function HomePage() {
               </button>
               {isExpanded && (
                 <p className="mt-3 text-sm text-slate-600 dark:text-slate-300">
-                  Search input is focused once the mock data finishes loading.
+                  Search input is focused once the API data finishes loading.
                 </p>
               )}
             </div>

@@ -1,15 +1,25 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useCartStore } from '../store/cartStore'
 import { useAuthStore } from '../store/authStore'
+import { createOrder } from '../api/client'
 import { OrderStatus } from '../types/index'
 
 export function CheckoutPage() {
   const navigate = useNavigate()
   const { items, getTotalPrice, clearCart } = useCartStore()
   const { token } = useAuthStore()
-  const [isProcessing, setIsProcessing] = useState(false)
   const [notes, setNotes] = useState('')
+  const queryClient = useQueryClient()
+  const orderMutation = useMutation({
+    mutationFn: createOrder,
+    onSuccess: (order) => {
+      queryClient.invalidateQueries({ queryKey: ['orders'] })
+      clearCart()
+      navigate('/order-confirmation', { state: { order } })
+    },
+  })
 
   useEffect(() => {
     if (!token) {
@@ -25,27 +35,14 @@ export function CheckoutPage() {
 
   const handlePlaceOrder = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    setIsProcessing(true)
-
-    // Simulate order placement
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-
-    // Create order
-    const newOrder = {
-      id: Math.floor(Math.random() * 10000) + 1000,
+    orderMutation.mutate({
       userId: 1,
       foodItemIds: items.map((item) => item.id),
       totalAmount: getTotalPrice(),
       status: OrderStatus.Placed,
-      createdAt: new Date(),
+      createdAt: new Date().toISOString(),
       notes,
-    }
-
-    console.log('Order placed:', newOrder)
-
-    // Clear cart and redirect
-    clearCart()
-    navigate('/order-confirmation', { state: { order: newOrder } })
+    })
   }
 
   return (
@@ -108,15 +105,15 @@ export function CheckoutPage() {
             <form onSubmit={handlePlaceOrder} className="mt-6 space-y-3">
               <button
                 type="submit"
-                disabled={isProcessing}
+                disabled={orderMutation.isPending}
                 className="w-full rounded-full bg-orange-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-orange-700 disabled:opacity-50 dark:bg-orange-500 dark:hover:bg-orange-600"
               >
-                {isProcessing ? 'Processing...' : 'Place Order'}
+                {orderMutation.isPending ? 'Processing...' : 'Place Order'}
               </button>
               <button
                 type="button"
                 onClick={() => navigate('/cart')}
-                disabled={isProcessing}
+                disabled={orderMutation.isPending}
                 className="w-full rounded-full border border-slate-300 bg-white px-6 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:opacity-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
               >
                 Back to Cart
