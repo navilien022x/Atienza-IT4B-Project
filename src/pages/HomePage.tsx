@@ -17,10 +17,10 @@ export function HomePage() {
   const { isDark, toggleDark } = useUiStore()
   const { isEnabled: isExpanded, toggle: toggleExpanded } = useToggle(false)
   const searchInputRef = useRef<HTMLInputElement | null>(null)
-  const usersQuery = useQuery({ queryKey: ['users'], queryFn: getUsers })
-  const foodQuery = useQuery({ queryKey: ['foodItems'], queryFn: getFoodItems })
-  const ordersQuery = useQuery({ queryKey: ['orders'], queryFn: getOrders })
-  const isLoading = usersQuery.isLoading || foodQuery.isLoading || ordersQuery.isLoading
+  const usersQuery = useQuery({ queryKey: ['users'], queryFn: getUsers, retry: false })
+  const foodQuery = useQuery({ queryKey: ['foodItems'], queryFn: getFoodItems, retry: false })
+  const ordersQuery = useQuery({ queryKey: ['orders'], queryFn: getOrders, retry: false })
+  const isLoading = usersQuery.isPending || foodQuery.isPending || ordersQuery.isPending
   const hasError = usersQuery.isError || foodQuery.isError || ordersQuery.isError
   const users: User[] = usersQuery.data ?? []
   const foodItems: FoodItem[] = foodQuery.data ?? []
@@ -62,7 +62,7 @@ export function HomePage() {
   const fallbackOrder = firstApiOrder ? { ...firstApiOrder, createdAt: new Date(firstApiOrder.createdAt) } : null
 
   const showSummary = fallbackUser?.role === 'vendor_admin'
-  const isReady = !isLoading && Boolean(fallbackUser) && Boolean(fallbackFood) && Boolean(fallbackOrder)
+  const isReady = !isLoading && Boolean(fallbackUser) && Boolean(fallbackFood)
 
   if (!isLoading && hasError) {
     return (

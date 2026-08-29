@@ -131,7 +131,7 @@ export function Layout() {
 
       <footer className="border-t border-slate-200 bg-white py-6 dark:border-slate-700 dark:bg-slate-900">
         <div className="mx-auto max-w-7xl px-4 text-center text-sm text-slate-600 dark:text-slate-400 sm:px-6 lg:px-8">
-          <p>© 2024 Campus Food Pre-Order System. All rights reserved.</p>
+          <p>© 2026 Campus Food Pre-Order System. All rights reserved.</p>
         </div>
       </footer>
     </div>

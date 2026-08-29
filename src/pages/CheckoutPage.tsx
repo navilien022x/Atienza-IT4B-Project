@@ -1,16 +1,21 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
 import { useCartStore } from '../store/cartStore'
 import { useAuthStore } from '../store/authStore'
 import { createOrder } from '../api/client'
 import { OrderStatus } from '../types/index'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { checkoutSchema, type CheckoutFormValues } from '@/schemas/checkoutSchema'
 
 export function CheckoutPage() {
   const navigate = useNavigate()
   const { items, getTotalPrice, clearCart } = useCartStore()
   const { token } = useAuthStore()
-  const [notes, setNotes] = useState('')
   const queryClient = useQueryClient()
   const orderMutation = useMutation({
     mutationFn: createOrder,
@@ -18,6 +23,17 @@ export function CheckoutPage() {
       queryClient.invalidateQueries({ queryKey: ['orders'] })
       clearCart()
       navigate('/order-confirmation', { state: { order } })
+    },
+  })
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<CheckoutFormValues>({
+    resolver: zodResolver(checkoutSchema),
+    defaultValues: {
+      notes: '',
     },
   })
 
@@ -33,15 +49,14 @@ export function CheckoutPage() {
     }
   }, [items.length, token, navigate])
 
-  const handlePlaceOrder = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+  const handlePlaceOrder = (values: CheckoutFormValues) => {
     orderMutation.mutate({
       userId: 1,
       foodItemIds: items.map((item) => item.id),
       totalAmount: getTotalPrice(),
       status: OrderStatus.Placed,
       createdAt: new Date().toISOString(),
-      notes,
+      notes: values.notes,
     })
   }
 
@@ -74,13 +89,20 @@ export function CheckoutPage() {
             {/* Special Instructions */}
             <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900 sm:p-8">
               <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100">Special Instructions</h2>
-              <textarea
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                placeholder="Add any special requests or notes..."
-                className="mt-3 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-800 placeholder-slate-500 transition focus:border-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-400 dark:focus:ring-orange-500/30"
-                rows={4}
-              />
+              <div className="mt-3 space-y-2">
+                <Label htmlFor="notes">Delivery notes</Label>
+                <Input
+                  id="notes"
+                  type="text"
+                  placeholder="Add any special requests or notes..."
+                  aria-invalid={Boolean(errors.notes)}
+                  {...register('notes')}
+                  className={errors.notes ? 'border-red-500 focus:border-red-500 focus:ring-red-200' : ''}
+                />
+                {errors.notes && (
+                  <p className="text-sm text-red-600 dark:text-red-400">{errors.notes.message}</p>
+                )}
+              </div>
             </section>
           </div>
 
@@ -102,22 +124,19 @@ export function CheckoutPage() {
               <span className="text-2xl font-black text-orange-600 dark:text-orange-300">₱{getTotalPrice()}</span>
             </div>
 
-            <form onSubmit={handlePlaceOrder} className="mt-6 space-y-3">
-              <button
-                type="submit"
-                disabled={orderMutation.isPending}
-                className="w-full rounded-full bg-orange-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-orange-700 disabled:opacity-50 dark:bg-orange-500 dark:hover:bg-orange-600"
-              >
+            <form onSubmit={handleSubmit(handlePlaceOrder)} className="mt-6 space-y-3">
+              <Button type="submit" disabled={orderMutation.isPending} className="w-full">
                 {orderMutation.isPending ? 'Processing...' : 'Place Order'}
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
+                variant="outline"
                 onClick={() => navigate('/cart')}
                 disabled={orderMutation.isPending}
-                className="w-full rounded-full border border-slate-300 bg-white px-6 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:opacity-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                className="w-full"
               >
                 Back to Cart
-              </button>
+              </Button>
             </form>
           </section>
         </div>

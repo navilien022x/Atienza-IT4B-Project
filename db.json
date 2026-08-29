@@ -101,6 +101,18 @@
       "createdAt": "2026-08-21T10:37:12.816Z",
       "notes": "",
       "id": "yGsoCOjm-fc"
+    },
+    {
+      "userId": 1,
+      "foodItemIds": [
+        "5",
+        "4"
+      ],
+      "totalAmount": 155,
+      "status": 0,
+      "createdAt": "2026-08-29T11:09:15.337Z",
+      "notes": "As soon as possible. I'm hungry hehe.",
+      "id": "hip6gY05QiQ"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

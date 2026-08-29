@@ -100,6 +100,12 @@ export function OrderPage() {
                 {new Date(order.createdAt).toLocaleString()}
               </dd>
             </div>
+            <div className="flex justify-between border-t border-slate-200 pt-4 dark:border-slate-700">
+              <dt className="text-sm font-medium text-slate-600 dark:text-slate-400">Note</dt>
+              <dd className="max-w-xs text-right text-sm font-semibold text-slate-800 dark:text-slate-200">
+                {order.notes ? order.notes : 'No special instructions'}
+              </dd>
+            </div>
           </dl>
         </section>
 
