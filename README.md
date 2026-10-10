@@ -62,6 +62,18 @@ Check TypeScript errors:
 npx tsc --noEmit
 ```
 
+## Backend API
+
+The Express/MongoDB API lives in `itelect4-backend`. From that directory, install
+dependencies and copy `.env.example` to `.env`, then set `MONGODB_URI` and a
+random `JWT_SECRET` of at least 32 characters. Start the API with `npm run dev`
+or compile it with `npm run build`.
+
+Authentication is available at `POST /api/auth/register` and
+`POST /api/auth/login`. The owned-order endpoints are `GET /api/orders`,
+`GET /api/orders/:id`, `POST /api/orders`, `PUT /api/orders/:id`, and
+`DELETE /api/orders/:id`; each requires `Authorization: Bearer <token>`.
+
 ## Project Requirements Completed (GT1)
 
 - Custom application interfaces in `types/index.ts`

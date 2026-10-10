@@ -70,6 +70,12 @@ web_modules/
 .env.*
 !.env.example
 
+# Backend environment and TypeScript configuration
+.env
+.env.example
+!.env.example
+tsconfig.json
+
 # parcel-bundler cache (https://parceljs.org/)
 .cache
 .parcel-cache
