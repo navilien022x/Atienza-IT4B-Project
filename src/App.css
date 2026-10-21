@@ -1,0 +1,98 @@
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: Inter, 'Segoe UI', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+
+.submission-badge h3 {
+  color: #111;
+  font-size: 18px;
+  margin: 0 0 8px;
+}
+.submission-badge p {
+  color: #4f463f;
+  font-size: 14px;
+  margin: 6px 0;
+}
+.submission-badge .meta { color:#7a736c; font-size:13px; }
+
+/* user-card controls: Select button and quick note input */
+.user-card button {
+  background: #c96d00;
+  color: #fff;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: transform 120ms ease, filter 120ms ease;
+  margin-top: 12px;
+}
+.user-card button:hover { filter: brightness(0.95); }
+.user-card button:active { transform: translateY(1px); }
+.user-card button:focus {
+  outline: 3px solid rgba(201,109,0,0.18);
+  outline-offset: 2px;
+}
+
+.user-card input {
+  width: 100%;
+  max-width: 360px;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid #e3d8ca;
+  border-radius: 10px;
+  font-size: 14px;
+  margin-top: 10px;
+  background: #fff;
+  color: #222; /* ensure typed text is visible */
+}
+.user-card input::placeholder { color: #b8b0a6; }
+.user-card input:focus {
+  border-color: var(--accent-border);
+  box-shadow: 0 8px 20px rgba(169, 59, 255, 0.06);
+  outline: none;
+}
+
+/* Card background palette for white site background */
+.user-card {
+  background: #f1f6ff; /* soft blue */
+  border: 1px solid #d7e9ff;
+}
+.course-card {
+  background: #fff7f0; /* soft peach */
+  border: 1px solid #ffe6d8;
+}
+.submission-badge {
+  background: #f0fff6; /* soft mint */
+  border: 1px solid #dff7e7;
+}
+
+/* ensure readable dark text on light cards */
+.user-card,
+.course-card,
+.submission-badge {
+  color: #222;
+}
+
+
