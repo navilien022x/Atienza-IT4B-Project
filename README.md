@@ -44,30 +44,31 @@ ReadyForPickup
 
 ## How to Run
 
-Install project dependencies:
+Install project dependencies and configure the frontend API URL:
 
 ```bash
 npm install
+copy .env.example .env
 ```
 
-Run the application:
+Set `VITE_API_URL` in `.env` to the backend API URL, then run the frontend:
 
 ```bash
 npm run dev
 ```
 
-Check TypeScript errors:
+Build the frontend and check TypeScript errors:
 
 ```bash
-npx tsc --noEmit
+npm run build
 ```
 
 ## Backend API
 
 The Express/MongoDB API lives in `itelect4-backend`. From that directory, install
-dependencies and copy `.env.example` to `.env`, then set `MONGODB_URI` and a
-random `JWT_SECRET` of at least 32 characters. Start the API with `npm run dev`
-or compile it with `npm run build`.
+dependencies and copy `.env.example` to `.env`, then set `MONGODB_URI`, a random
+`JWT_SECRET` of at least 32 characters, and `CORS_ORIGIN=http://localhost:5173`.
+Start the API with `npm run dev` and seed the food catalog with `npm run seed`.
 
 Authentication is available at `POST /api/auth/register` and
 `POST /api/auth/login`. The owned-order endpoints are `GET /api/orders`,

@@ -42,7 +42,7 @@ const users: User[] = [
 
   {
 
-    id: 1,
+    id: "1",
 
     name: "Neil Atienza",
 
@@ -57,7 +57,7 @@ const users: User[] = [
 
   {
 
-    id: 2,
+    id: "2",
 
     name: "Campus Food Admin",
 
@@ -82,7 +82,7 @@ const foodItems: FoodItem[] = [
 
   {
 
-    id: 1,
+    id: "1",
 
     name: "Chicken Rice Meal",
 
@@ -99,7 +99,7 @@ const foodItems: FoodItem[] = [
 
   {
 
-    id: 2,
+    id: "2",
 
     name: "Milk Tea",
 
@@ -124,15 +124,14 @@ const foodItems: FoodItem[] = [
 
 const order: Order = {
 
-  id: 101,
-
-  userId: 1,
+  id: "101",
+  userId: "1",
 
   foodItemIds: [
 
-    1,
+    "1",
 
-    2
+    "2"
 
   ],
 
@@ -241,7 +240,7 @@ getFirst(foodItems);
 
 
 const selectedFood =
-getById(foodItems, 1);
+getById(foodItems, "1");
 
 
 
@@ -259,7 +258,7 @@ const updateFood: FoodItemUpdate = {
 
 const foodPreview: FoodPreview = {
 
-  id: 1,
+  id: "1",
 
   name: "Chicken Rice Meal",
 
@@ -272,7 +271,7 @@ const foodPreview: FoodPreview = {
 
 const publicUser: PublicUser = {
 
-  id: 1,
+  id: "1",
 
   name: "Neil Atienza",
 
@@ -302,8 +301,8 @@ const orderCount: OrderStatusCount = {
 
 const newOrder =
 createOrder(
-  1,
-  [1,2]
+  "1",
+  ["1", "2"]
 );
 
 

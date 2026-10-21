@@ -1,28 +1,32 @@
 import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 import { useQuery } from '@tanstack/react-query'
+import { useNavigate } from 'react-router'
 import heroImg from '../assets/hero.png'
-import UserCard from '../components/UserCard'
 import CourseCard from '../components/CourseCard'
 import { useToggle } from '../hooks/useToggle'
-import type { User, FoodItem } from '../types/index'
-import { getFoodItems, getOrders, getUsers } from '../api/client'
+import type { FoodItem } from '../types/index'
+import { getFoodItems, getOrders } from '../api/client'
+import { useAuthStore } from '../store/authStore'
 import { useUiStore } from '../store/uiStore'
 
 export function HomePage() {
-  const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [selectedFood, setSelectedFood] = useState<FoodItem | null>(null)
-  const [selectionMessage, setSelectionMessage] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
   const [previousSearchTerm, setPreviousSearchTerm] = useState<string | null>(null)
+  const navigate = useNavigate()
+  const { token, user } = useAuthStore()
   const { isDark, toggleDark } = useUiStore()
   const { isEnabled: isExpanded, toggle: toggleExpanded } = useToggle(false)
   const searchInputRef = useRef<HTMLInputElement | null>(null)
-  const usersQuery = useQuery({ queryKey: ['users'], queryFn: getUsers, retry: false })
   const foodQuery = useQuery({ queryKey: ['foodItems'], queryFn: getFoodItems, retry: false })
-  const ordersQuery = useQuery({ queryKey: ['orders'], queryFn: getOrders, retry: false })
-  const isLoading = usersQuery.isPending || foodQuery.isPending || ordersQuery.isPending
-  const hasError = usersQuery.isError || foodQuery.isError || ordersQuery.isError
-  const users: User[] = usersQuery.data ?? []
+  const ordersQuery = useQuery({
+    queryKey: ['orders'],
+    queryFn: getOrders,
+    enabled: Boolean(token),
+    retry: false,
+  })
+  const isLoading = foodQuery.isPending || (Boolean(token) && ordersQuery.isPending)
+  const hasError = foodQuery.isError || (Boolean(token) && ordersQuery.isError)
   const foodItems: FoodItem[] = foodQuery.data ?? []
 
   useEffect(() => {
@@ -34,15 +38,6 @@ export function HomePage() {
       searchInputRef.current.focus()
     }
   }, [isLoading])
-
-  const handleSelectUser = (user: User): void => {
-    setSelectedUser(user)
-    setSelectionMessage('Profile selected')
-  }
-
-  const dismissSelectionMessage = (): void => {
-    setSelectionMessage('')
-  }
 
   const handleSearchChange = (event: ChangeEvent<HTMLInputElement>): void => {
     setPreviousSearchTerm(searchTerm)
@@ -56,20 +51,19 @@ export function HomePage() {
           item.name.toLowerCase().includes(searchTerm.toLowerCase()),
         )
 
-  const fallbackUser = selectedUser ?? users[0]
   const fallbackFood = selectedFood ?? foodItems[0]
   const firstApiOrder = ordersQuery.data?.[0]
-  const fallbackOrder = firstApiOrder ? { ...firstApiOrder, createdAt: new Date(firstApiOrder.createdAt) } : null
+  const fallbackOrder = firstApiOrder ?? null
 
-  const showSummary = fallbackUser?.role === 'vendor_admin'
-  const isReady = !isLoading && Boolean(fallbackUser) && Boolean(fallbackFood)
+  const showSummary = user?.role === 'vendor_admin'
+  const isReady = !isLoading
 
   if (!isLoading && hasError) {
     return (
       <div className="min-h-screen bg-slate-100 px-4 py-8 text-slate-800 dark:bg-slate-950 dark:text-slate-100 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-5xl rounded-[28px] border border-red-200 bg-red-50 p-8 text-center dark:border-red-500/20 dark:bg-red-500/10">
           <h1 className="text-3xl font-black text-red-700 dark:text-red-300">Dashboard unavailable</h1>
-          <p className="mt-3 text-sm text-red-700 dark:text-red-200">Start the API with <code>npm run api</code>, then reload this page.</p>
+          <p className="mt-3 text-sm text-red-700 dark:text-red-200">Check that the backend API and database are available, then reload this page.</p>
         </div>
       </div>
     )
@@ -150,15 +144,15 @@ export function HomePage() {
               <ul className="mt-3 space-y-2 text-sm text-slate-600 dark:text-slate-300">
                 {showSummary ? (
                   <>
-                    <li>Viewing as vendor: {fallbackUser?.name}</li>
+                    <li>Viewing as vendor: {user?.name}</li>
                     <li>Menu items: {foodItems.length}</li>
-                    <li>Known orders: 1</li>
+                    <li>Your orders: {ordersQuery.data?.length ?? 0}</li>
                   </>
                 ) : (
                   <>
-                    <li>Logged in as: {fallbackUser?.name}</li>
-                    <li>Current order ID: {fallbackOrder?.id}</li>
-                    <li>Total items in order: {fallbackOrder?.foodItemIds.length}</li>
+                    <li>{user ? `Logged in as: ${user.name}` : 'Browse the menu as a guest'}</li>
+                    <li>Current order ID: {fallbackOrder?.id ?? 'None'}</li>
+                    <li>Total items in order: {fallbackOrder?.foodItemIds.length ?? 0}</li>
                   </>
                 )}
               </ul>
@@ -175,42 +169,41 @@ export function HomePage() {
 
             <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
               <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100">Current order</h2>
-              <p className="mt-3 text-sm text-amber-700 dark:text-amber-300 font-semibold">Order #{fallbackOrder?.id}</p>
-              <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">Total: <span className="font-bold">₱{fallbackOrder?.totalAmount}</span></p>
+              <p className="mt-3 text-sm text-amber-700 dark:text-amber-300 font-semibold">
+                {fallbackOrder ? `Order #${fallbackOrder.id}` : 'No orders yet'}
+              </p>
+              <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
+                Total: <span className="font-bold">{fallbackOrder ? `₱${fallbackOrder.totalAmount}` : '—'}</span>
+              </p>
             </div>
           </div>
         </section>
 
         <section className="space-y-4">
           <div>
-            <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">Student Profiles</h2>
-            <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">Click a profile card to select the active user</p>
+            <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">Your Account</h2>
+            <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">Your account is used to securely associate your orders.</p>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {users.map((user) => (
-              <button
-                key={user.id}
-                onClick={() => handleSelectUser(user)}
-                className={`text-left transform transition-all ${
-                  selectedUser?.id === user.id ? 'ring-2 ring-orange-500 dark:ring-orange-300' : 'hover:scale-105'
-                }`}
-              >
-                <UserCard user={user} onSelect={handleSelectUser} />
-              </button>
-            ))}
+          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+            {user ? (
+              <>
+                <p className="text-lg font-bold text-slate-900 dark:text-slate-100">{user.name}</p>
+                <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">{user.email}</p>
+                <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">Role: {user.role}</p>
+              </>
+            ) : (
+              <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-sm text-slate-600 dark:text-slate-300">Sign in or create an account to place and track orders.</p>
+                <button
+                  type="button"
+                  onClick={() => navigate('/login')}
+                  className="rounded-full bg-orange-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-orange-700 dark:bg-orange-500 dark:hover:bg-orange-600"
+                >
+                  Sign in
+                </button>
+              </div>
+            )}
           </div>
-          {selectionMessage && (
-            <div className="flex items-center justify-between rounded-2xl border border-blue-200 bg-blue-50 p-4 dark:border-blue-500/20 dark:bg-blue-500/10">
-              <p className="text-sm font-medium text-blue-700 dark:text-blue-300">{selectionMessage}</p>
-              <button
-                type="button"
-                onClick={dismissSelectionMessage}
-                className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
-              >
-                ✕
-              </button>
-            </div>
-          )}
         </section>
 
         <section className="space-y-4">

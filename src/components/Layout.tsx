@@ -6,7 +6,7 @@ export function Layout() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
-  const { token, role, logout } = useAuthStore()
+  const { token, user, logout } = useAuthStore()
 
   const isActive = (path: string) => location.pathname === path
 
@@ -57,7 +57,7 @@ export function Layout() {
                     <div className="text-right">
                       <p className="text-xs text-slate-600 dark:text-slate-400">Account type</p>
                       <p className="text-sm font-semibold capitalize text-slate-800 dark:text-slate-100">
-                        {role === 'student' ? '👤 Student' : '🏪 Vendor'}
+                        {user?.role === 'student' ? '👤 Student' : '🏪 Vendor'}
                       </p>
                     </div>
                   </div>

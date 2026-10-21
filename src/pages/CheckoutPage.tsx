@@ -6,7 +6,6 @@ import { useForm } from 'react-hook-form'
 import { useCartStore } from '../store/cartStore'
 import { useAuthStore } from '../store/authStore'
 import { createOrder } from '../api/client'
-import { OrderStatus } from '../types/index'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -15,7 +14,7 @@ import { checkoutSchema, type CheckoutFormValues } from '@/schemas/checkoutSchem
 export function CheckoutPage() {
   const navigate = useNavigate()
   const { items, getTotalPrice, clearCart } = useCartStore()
-  const { token } = useAuthStore()
+  const token = useAuthStore((state) => state.token)
   const queryClient = useQueryClient()
   const orderMutation = useMutation({
     mutationFn: createOrder,
@@ -51,11 +50,8 @@ export function CheckoutPage() {
 
   const handlePlaceOrder = (values: CheckoutFormValues) => {
     orderMutation.mutate({
-      userId: 1,
       foodItemIds: items.map((item) => item.id),
       totalAmount: getTotalPrice(),
-      status: OrderStatus.Placed,
-      createdAt: new Date().toISOString(),
       notes: values.notes,
     })
   }
@@ -125,6 +121,13 @@ export function CheckoutPage() {
             </div>
 
             <form onSubmit={handleSubmit(handlePlaceOrder)} className="mt-6 space-y-3">
+              {orderMutation.isError && (
+                <p role="alert" className="text-sm text-red-600 dark:text-red-400">
+                  {orderMutation.error instanceof Error
+                    ? orderMutation.error.message
+                    : 'Unable to place your order.'}
+                </p>
+              )}
               <Button type="submit" disabled={orderMutation.isPending} className="w-full">
                 {orderMutation.isPending ? 'Processing...' : 'Place Order'}
               </Button>

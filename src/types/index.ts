@@ -10,7 +10,7 @@
 
 export interface User {
 
-  id: number;
+  id: string;
 
   name: string;
 
@@ -26,7 +26,7 @@ export interface User {
 
 export interface FoodItem {
 
-  id: number;
+  id: string;
 
   name: string;
 
@@ -44,11 +44,11 @@ export interface FoodItem {
 
 export interface Order {
 
-  id: number;
+  id: string;
 
-  userId: number;
+  userId: string;
 
-  foodItemIds: number[];
+  foodItemIds: string[];
 
   totalAmount: number;
 
@@ -137,13 +137,13 @@ Record<
 // ReturnType
 
 export function createOrder(
-  userId: number,
-  foodItemIds: number[]
+  userId: string,
+  foodItemIds: string[]
 ) {
 
   return {
 
-    id: Date.now(),
+    id: Date.now().toString(),
 
     userId,
 
@@ -178,9 +178,9 @@ export function getFirst<T>(
 
 
 
-export function getById<T extends { id: number }>(
+export function getById<T extends { id: string | number }>(
   items: T[],
-  id: number
+  id: T['id']
 ): T | undefined {
 
   return items.find(
@@ -189,7 +189,8 @@ export function getById<T extends { id: number }>(
 
 }
 
-export type ApiFoodItem = Omit<FoodItem, 'id'> & { id: number }
-export type ApiUser = Omit<User, 'id'> & { id: number }
-export type ApiOrder = Omit<Order, 'createdAt'> & { id: number; createdAt: string }
-export type CreateOrderInput = Omit<ApiOrder, 'id'>
+export type ApiFoodItem = FoodItem
+export type ApiUser = User
+export type ApiOrder = Omit<Order, 'createdAt'> & { createdAt: string }
+export type AuthResponse = { token: string; user: ApiUser }
+export type CreateOrderInput = Pick<ApiOrder, 'foodItemIds' | 'totalAmount' | 'notes'>

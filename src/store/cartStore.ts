@@ -8,8 +8,8 @@ export interface CartItem extends FoodItem {
 export interface CartState {
   items: CartItem[]
   addToCart: (item: FoodItem, quantity: number) => void
-  removeFromCart: (itemId: number) => void
-  updateQuantity: (itemId: number, quantity: number) => void
+  removeFromCart: (itemId: string) => void
+  updateQuantity: (itemId: string, quantity: number) => void
   clearCart: () => void
   getTotalPrice: () => number
   getTotalItems: () => number
@@ -32,12 +32,12 @@ export const useCartStore = create<CartState>((set, get) => ({
       }
     })
   },
-  removeFromCart: (itemId: number) => {
+  removeFromCart: (itemId: string) => {
     set((state) => ({
       items: state.items.filter((i) => i.id !== itemId),
     }))
   },
-  updateQuantity: (itemId: number, quantity: number) => {
+  updateQuantity: (itemId: string, quantity: number) => {
     if (quantity <= 0) {
       get().removeFromCart(itemId)
       return

@@ -10,7 +10,7 @@ export function OrdersPage() {
     queryFn: getOrders,
   })
 
-  const handleOrderClick = (orderId: number) => {
+  const handleOrderClick = (orderId: string) => {
     navigate(`/orders/${orderId}`)
   }
 

@@ -10,10 +10,11 @@ import type { FoodItem } from '../types/index'
 export function MenuPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
-  const [addedItem, setAddedItem] = useState<number | null>(null)
+  const [addedItem, setAddedItem] = useState<string | null>(null)
   const navigate = useNavigate()
   const { addToCart, getTotalItems } = useCartStore()
-  const { role } = useAuthStore()
+  const { user } = useAuthStore()
+  const role = user?.role
   const { data: menuItems = [], isLoading, isError } = useQuery({
     queryKey: ['foodItems'],
     queryFn: getFoodItems,
