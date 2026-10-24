@@ -194,3 +194,13 @@ export type ApiUser = User
 export type ApiOrder = Omit<Order, 'createdAt'> & { createdAt: string }
 export type AuthResponse = { token: string; user: ApiUser }
 export type CreateOrderInput = Pick<ApiOrder, 'foodItemIds' | 'totalAmount' | 'notes'>
+
+export type AiReply = {
+  summary: string
+  recommendations: {
+    name: string
+    description: string
+    category: 'quick' | 'balanced' | 'comfort'
+  }[]
+  tips: string[]
+}
