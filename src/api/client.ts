@@ -2,6 +2,7 @@ import { useAuthStore } from '../store/authStore'
 import type {
   ApiFoodItem,
   ApiOrder,
+  AiReply,
   AuthResponse,
   CreateOrderInput,
 } from '../types'
@@ -58,3 +59,5 @@ export const getOrders = () => request<ApiOrder[]>('/api/orders')
 export const getOrder = (id: string) => request<ApiOrder>(`/api/orders/${id}`)
 export const createOrder = (order: CreateOrderInput) =>
   request<ApiOrder>('/api/orders', { method: 'POST', body: JSON.stringify(order) })
+export const askAi = (prompt: string) =>
+  request<AiReply>('/api/ai', { method: 'POST', body: JSON.stringify({ prompt }) })

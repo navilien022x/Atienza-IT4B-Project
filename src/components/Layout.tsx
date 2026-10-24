@@ -19,6 +19,7 @@ export function Layout() {
     { label: 'Home', path: '/' },
     { label: 'Menu', path: '/menu' },
     { label: 'Orders', path: '/orders' },
+    { label: 'AI Assistant', path: '/ai-assistant' },
   ]
 
   return (

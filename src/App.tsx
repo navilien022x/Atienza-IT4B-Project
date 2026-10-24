@@ -4,6 +4,7 @@ import { ProtectedRoute } from './components/ProtectedRoute'
 import { HomePage } from './pages/HomePage'
 import { MenuPage } from './pages/MenuPage'
 import { OrdersPage } from './pages/OrdersPage'
+import { AiAssistantPage } from './pages/AiAssistantPage'
 import { OrderPage } from './pages/OrderPage'
 import { CartPage } from './pages/CartPage'
 import { CheckoutPage } from './pages/CheckoutPage'
@@ -28,6 +29,7 @@ function App() {
           <Route path="/order-confirmation" element={<OrderConfirmationPage />} />
           <Route path="/orders" element={<OrdersPage />} />
           <Route path="/orders/:id" element={<OrderPage />} />
+          <Route path="/ai-assistant" element={<AiAssistantPage />} />
         </Route>
       </Route>
 
