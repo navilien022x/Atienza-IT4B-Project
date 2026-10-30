@@ -1,5 +1,7 @@
 # Campus Food Pre-Order System
 
+![CI](https://github.com/navilien022x/Atienza-IT4B-Project/actions/workflows/ci.yml/badge.svg?branch=main)
+
 ## Project Concept
 
 The Campus Food Pre-Order System is a TypeScript-based application designed to improve the food ordering experience within a campus environment.
